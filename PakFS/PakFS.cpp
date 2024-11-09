@@ -38,7 +38,14 @@ PakFS::~PakFS() {
 int PakFS::getFileSize(const std::string& t_filename) {
     if(files[t_filename] == -1) {
         std::ifstream file(base + "/" + t_filename, std::ios::binary | std::ios::ate);
-        return file.tellg();
+        std::streampos size = file.tellg();
+        if (size > UINT32_MAX)
+        {
+            std::cout << "Warning: " << base << "/" << t_filename << " exceeds max file size for PAK";
+            return UINT32_MAX;
+        }else{
+            return static_cast<int>(size);
+        }
     }else{
         return pakFiles[files[t_filename]]->getFileSize(t_filename);
     }
